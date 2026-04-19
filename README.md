@@ -3,7 +3,7 @@ Uma aplicação que baixa videos/audios via yt-dlp em python, com sistema de pes
 
 # OBRIGATORIOS
 - [yt-dlp](https://github.com/yt-dlp/yt-dlp)
-- [Deno](https://deno.com/)
+- [Deno](https://deno.com/) - um JavaScript runtime (há como utilizar outros, adicionando uma linha nos .conf, mas é recomendado pelo yt-dlp utilizar ele)
 
 ---
 
