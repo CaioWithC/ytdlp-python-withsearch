@@ -1,12 +1,12 @@
 import subprocess
 import googleapiclient.discovery
 
-youtube = googleapiclient.discovery.build("youtube", "v3", developerKey="YOUR_API_KEY_HERE")
+youtube = googleapiclient.discovery.build("youtube", "v3", developerKey="YOUR_API_KEY")
 
 def search_video(query):
     request = youtube.search().list(
         part="snippet",
-        maxResults=5,
+        maxResults=5, # Limit the number of results to 5 for better user experience
         q=query,
         type="video"
     )
@@ -41,16 +41,75 @@ def search_video(query):
     selected = results[choice]
 
     url = f"https://www.youtube.com/watch?v={selected['videoId']}"
-    configfile = input("What type of download do you want? (mp3, mp4 or webm): ")
-    subprocess.run(f"yt-dlp --config-location \"templates\\{configfile}.conf\" {url}", shell=True)
+    print("" \
+    "Configs available:\n" \
+    "1. mp3 \n" \
+    "2. mp4 \n" \
+    "3. webm\n" \
+    "4. mp3 [music]\n" \
+    "")
+    configfile = input("What type of download do you want? (type a number): ")
+    make_folder = input("Do you want to save it in a folder? (y/n): ").lower()
+    add_metadata = input("Do you want to embed metadata? (y/n): ").lower()
+    embed_thumb = input("Do you want to embed the thumbnail? (y/n): ").lower()
+
+    extra_flags = ""
+
+    if make_folder == "y":
+        folder_name = input("Enter the folder name: ")
+        extra_flags += f" -o \"{folder_name}/%(title)s.%(ext)s\""
+    
+    if make_folder == "n": 
+        extra_flags += " -o \"%(title)s.%(ext)s\""
+    
+    
+    if add_metadata == "y":
+        extra_flags += " --add-metadata"
+        extra_flags += " --parse-metadata \"title:%(artist)s - %(title)s\""
+
+    if embed_thumb == "y":
+        extra_flags += " --embed-thumbnail"
+
+    subprocess.run(f"yt-dlp --config-location \"templates\\{configfile}.conf\"{extra_flags} {url}", shell=True)
 
 
 answer = input("Do you want to search for a video? (y/n): ").lower()
+
 if answer == "y":
     search_query = input("Enter the search query: ")
     search_video(search_query)
 
-if answer == "n":
-    input_url = input("Enter the URL of the video you want to download as MP3: ")
-    configfile = input("What type of download do you want? (mp3, mp4 or webm): ")
-    subprocess.run(f"yt-dlp --config-location \"templates\\{configfile}.conf\" {input_url}", shell=True)
+elif answer == "n":
+    input_url = input("Enter the URL of the video you want to download: ")
+    print("" \
+    "Configs available:\n" \
+    "1. mp3 \n" \
+    "2. mp4 \n" \
+    "3. webm\n" \
+    "4. mp3 [music]\n" \
+    "")
+    configfile = input("What type of download do you want? (type a number): ")
+    
+    make_folder = input("Do you want to save it in a folder? (y/n): ").lower()
+    add_metadata = input("Do you want to embed metadata? (y/n): ").lower()
+    embed_thumb = input("Do you want to embed the thumbnail? (y/n): ").lower()
+
+    extra_flags = ""
+
+    if make_folder == "y":
+        folder_name = input("Enter the folder name: ")
+        extra_flags += f" -o \"{folder_name}/%(title)s.%(ext)s\""
+
+    if make_folder == "n": 
+        extra_flags += " -o \"%(title)s.%(ext)s\""
+    
+    if add_metadata == "y":
+        extra_flags += " --add-metadata"
+
+    if embed_thumb == "y":
+        extra_flags += " --embed-thumbnail"
+
+    subprocess.run(
+        f"yt-dlp --config-location \"templates\\{configfile}.conf\"{extra_flags} {input_url}",
+        shell=True
+    )
